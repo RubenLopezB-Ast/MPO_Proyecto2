@@ -1,3 +1,6 @@
+from colorama import init, Fore, Style
+init(autoreset=True)
+
 import os
 import shutil
 
@@ -10,8 +13,10 @@ def mostrar_menu():
     print("3. Creación de nuevo archivo de texto")
     print("4. Añadir texto a un archivo existente")
     print("5. Eliminar un archivo o directorio")
-    print("6. Mostrar los detalles del archivo")
-    print("7. Salir")
+    print("6. Mostrar información de  un elemento (archivo o carpeta)")
+    print("7. Renombrar un elemento (archivo o carpeta)")
+    print("8. Total del tamaño de todos los elementos del directorio")
+    print("9. Salir")
 
 def listar_contenido():
     print("\n Este directorio contiene: ")
@@ -22,11 +27,11 @@ def listar_contenido():
         else:
             for elemento in elementos:
                 if os.path.isdir(elemento):
-                    print(f"*Carpeta* {elemento}")
+                    print(f"{Fore.YELLOW}[*Carpeta*]{Style.RESET_ALL} {elemento}")
                 elif os.path.isfile(elemento):
-                    print(f"*Archivo* {elemento}")
+                    print(f"{Fore.BLACK}[*Archivo*]{Style.RESET_ALL} {elemento}")
                 else:
-                    print(f"*Otro/s* {elemento}")
+                    print(f"{Fore.GREEN}[*Otro/s*]{Style.RESET_ALL} {elemento}")
     except Exception as e:
         print("|||| ERROR ||||", str(e))
 
@@ -90,8 +95,8 @@ def eliminar():
 def info():
     nombre = input("\n Te mostraré la información del archivo o carpeta: ")
     try:
-        if not os.path.exists(nombre):
-            print("**** No encontramos ese archivo o carpeta, inténtalo de nuevo. ||||")
+        if not os.path.getsize(nombre):
+            print("**** No encontramos ese archivo o carpeta, inténtalo de nuevo. ****")
         else:
             peso = os.path.exists(nombre)
             from datetime import datetime
@@ -104,6 +109,28 @@ def info():
             print(f"\n El tamaño del archivo es '{peso}' Bytes")
     except Exception as e:
         print("|||| ERROR AL MOSTRAR LA INFORMACIÓN DEL ARCHIVO: ",str(e), "||||")
+def renombrar():
+    actual = input("\n Pon el nombre del archivo al que vamos a cambiar el nombre: ")
+    if not os.path.exists(actual):
+        print("**** No encontramos ese archivo o carpeta, inténtalo de nuevo. ****")
+        return
+    nuevo_nombre = input("\n Dínos como quieres que se llame a partir de ahora: ")
+    try:
+        os.rename(actual, nuevo_nombre)
+        print(f"El elemento '{actual}' pasa llamarse '{nuevo_nombre}' .")
+    except Exception as e:
+        print("|||| ERROR AL CAMBIAR EL NOMBRE AL ELEMENTO: ", str(e), "||||")
+
+def tamano_total():
+    try:
+        total = 0
+        for elemento in os.listdir():
+            if os.path.isfile(elemento):
+                total += os.path.getsize(elemento)
+        print(f"\n El tamaño toal de todos los elementos de este directorio es: {total} Bytes")
+    except Exception as e:
+        print("|||| ERROR NO PUEDO MOSTAR EL TAMAÑO TOTAL DEL DIRECTORIO: ", str(e), "||||")
+
 def main():
     while True:
         mostrar_menu()
@@ -121,7 +148,11 @@ def main():
             eliminar() #Eliminar elemento
         elif opcion == "6":
             info() #Mostrar info
-        elif info() == "7":
+        elif opcion == "7":
+            renombrar() #Renombrar
+        elif opcion == "8":
+            tamano_total() #Mostrar tamaño total
+        elif opcion == "9":
             print("*** Regresa cuando quieras ***")
             break
         else:
